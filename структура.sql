@@ -15,16 +15,27 @@ CREATE TABLE `groups` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-DROP TABLE IF EXISTS `marks`;
+DROP TABLE IF EXISTS `subjects`;
 
-CREATE TABLE `marks` (
-  `study` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `student` INT(11) UNSIGNED NOT NULL,
-  `mark` INT(1) UNSIGNED NOT NULL CHECK(`mark` >= 1 AND `mark` <= 5),
-  PRIMARY KEY (`study`,`student`),
-  KEY `student_key` (`student`),
-  CONSTRAINT `student_key` FOREIGN KEY (`student`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `study_key` FOREIGN KEY (`study`) REFERENCES `study` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CREATE TABLE `subjects` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `type` ENUM('математический','гуманитарный') NOT NULL DEFAULT 'математический',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `fio` VARCHAR(255) NOT NULL,
+  `birth_date` DATE NOT NULL CHECK(`birth_date` >= '01-01-1900'),
+  `email` VARCHAR(255) NOT NULL,
+  `phone` VARCHAR(11) DEFAULT NULL,
+  `sex` ENUM('м','ж') NOT NULL DEFAULT 'м',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -48,8 +59,9 @@ CREATE TABLE `study` (
   `group_id` INT(11) UNSIGNED NOT NULL,
   `subject_id` INT(11) UNSIGNED NOT NULL,
   `year` INT(4) UNSIGNED NOT NULL CHECK(`year` >= 2000),
+  `semester` INT(1) UNSIGNED NOT NULL CHECK(`semester` >= 1 AND `semester` <= 2),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `study` (`teacher_id`,`group_id`,`subject_id`,`year`),
+  UNIQUE KEY `study` (`teacher_id`,`group_id`,`subject_id`,`year`,`semester`),
   KEY `group_key` (`group_id`),
   KEY `subject_key` (`subject_id`),
   CONSTRAINT `group_key` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -58,25 +70,15 @@ CREATE TABLE `study` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-DROP TABLE IF EXISTS `subjects`;
+DROP TABLE IF EXISTS `marks`;
 
-CREATE TABLE `subjects` (
-  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NOT NULL,
-  `type` ENUM('математический','гуманитарный') NOT NULL DEFAULT 'математический',
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-DROP TABLE IF EXISTS `users`;
-
-CREATE TABLE `users` (
-  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `fio` VARCHAR(255) NOT NULL,
-  `birth_date` DATE NOT NULL CHECK(`birth_date` >= '01-01-1900'),
-  `email` VARCHAR(255) NOT NULL,
-  `phone` VARCHAR(11) DEFAULT NULL,
-  `sex` ENUM('м','ж') NOT NULL DEFAULT 'м',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
+CREATE TABLE `marks` (
+  `study` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student` INT(11) UNSIGNED NOT NULL,
+  `mark` INT(1) UNSIGNED NOT NULL CHECK(`mark` >= 1 AND `mark` <= 5),
+  `date` DATE NOT NULL DEFAULT CURRENT_DATE,
+  PRIMARY KEY (`study`,`student`),
+  KEY `student_key` (`student`),
+  CONSTRAINT `student_key` FOREIGN KEY (`student`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `study_key` FOREIGN KEY (`study`) REFERENCES `study` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
