@@ -209,8 +209,7 @@ FROM
     INNER JOIN subjects ON max_marks_count.subject_id = subjects.id
     INNER JOIN `groups` ON average_marks.group = `groups`.id
 WHERE
-    max_marks_count.count = 1
-;
+    max_marks_count.count = 1;
 
 -- 11) Вставьте записи о новом студенте с его личной информацией: ФИО, дата рождения, контактные данные и др
 INSERT INTO users (fio, birth_date, email, phone, sex) VALUES ('Иванов Иван Иванович', '2000-01-01', 'ivan@ivanov.ru', '79991234567', 'м');
@@ -219,7 +218,7 @@ INSERT INTO users (fio, birth_date, email, phone, sex) VALUES ('Иванов И�
 UPDATE users SET email = 'new@email.com', phone = '79001000000' WHERE id = 1;
 
 -- 13) удаление записи о предмете, который больше не преподают в учебном заведении
-DELETE FROM subjects WHERE name = 'Подготовительные курсы';
+DELETE FROM subjects WHERE id = 9;
 
 -- 14) вставка новой записи об оценке, выставленной студенту по определённому предмету, с указанием даты, преподавателя и полученной оценки
 INSERT INTO marks (study, student, mark, date) VALUES (1, 1, 4, '2023-12-25');
